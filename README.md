@@ -10,11 +10,12 @@ One example on running the code:
 
 **FFNN**
 
-To run FFNN, run ``./ffnn.sh``
+To run the FFNN model, run ``./ffnn.sh``
+
 Custom parameters can be set in the script.
 
 **RNN**
 
-``python rnn.py --hidden_dim 32 --epochs 10 ``
-``--train_data training.json --val_data validation.json``
+To run the RNN model, run ``./rnn.sh``
 
+Custom parameters can be set in the script.
