@@ -10,9 +10,8 @@ One example on running the code:
 
 **FFNN**
 
-``python ffnn.py --hidden_dim 10 --epochs 1 ``
-``--train_data ./training.json --val_data ./validation.json``
-
+To run FFNN, run ``./ffnn.sh``
+Custom parameters can be set in the script.
 
 **RNN**
 
