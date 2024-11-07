@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Word Document data
+~*
+
 
 word_embedding.pkl
 training.json
