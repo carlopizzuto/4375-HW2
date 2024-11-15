@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import random
 import time
+import numpy as np
 from tqdm import tqdm
 import json
 from argparse import ArgumentParser
@@ -129,8 +130,12 @@ if __name__ == "__main__":
 
     model = FFNN(input_dim = len(vocab), h = args.hidden_dim)
     optimizer = optim.SGD(model.parameters(),lr=0.01, momentum=0.9)
+
+    metrics_table = np.zeros((args.epochs, 4))  # 4 columns for train_acc, val_acc, train_loss, val_loss
+    
     if args.do_train:
         print("========== Training for {} epochs ==========".format(args.epochs))
+        total_time = time.time()
         for epoch in range(args.epochs):
             model.train()
             optimizer.zero_grad()
@@ -159,10 +164,12 @@ if __name__ == "__main__":
                 loss = loss / minibatch_size
                 loss.backward()
                 optimizer.step()
+                
+            acc_test = correct / total
+            loss_test = loss.item()
             print("Training completed for epoch {}".format(epoch + 1))
-            print("Training accuracy for epoch {}: {}".format(epoch + 1, correct / total))
+            print("Training accuracy for epoch {}: {}".format(epoch + 1, acc_test))
             print("Training time for this epoch: {}".format(time.time() - start_time))
-
 
             loss = None
             correct = 0
@@ -186,14 +193,27 @@ if __name__ == "__main__":
                     else:
                         loss += example_loss
                 loss = loss / minibatch_size
+            acc_val = correct / total
+            loss_val = loss.item()
             print("Validation completed for epoch {}".format(epoch + 1))
-            print("Validation accuracy for epoch {}: {}".format(epoch + 1, correct / total))
+            print("Validation accuracy for epoch {}: {}".format(epoch + 1, acc_val))
             print("Validation time for this epoch: {}".format(time.time() - start_time))
+            
+            # Store metrics in table
+            metrics_table[epoch] = [acc_test, acc_val, loss_test, loss_val]
+        
+        print("========== Training completed ==========")
+        print("Total training time: {}".format(time.time() - total_time))
+        print("\nMetrics Table:")
+        print("epoch\ttrain_acc\tval_acc\t\ttrain_loss\tval_loss")
+        for epoch in range(args.epochs):
+            print(f"{epoch+1}\t{metrics_table[epoch][0]:.4f}\t\t{metrics_table[epoch][1]:.4f}\t\t{metrics_table[epoch][2]:.4f}\t\t{metrics_table[epoch][3]:.4f}")
+        
             
     if args.do_infer:
         print("========== Inference ==========")
         # Take a random sample from test data
-        sample_size = 10  # You can adjust this number
+        sample_size = 10  
         test_samples = random.sample(test_data, sample_size)
         
         model.eval()  # Set model to evaluation mode
