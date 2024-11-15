@@ -81,20 +81,25 @@ def convert_to_vector_representation(data, word2index):
 
 
 
-def load_data(train_data, val_data):
+def load_data(train_data, val_data, test_data):
     with open(train_data) as training_f:
         training = json.load(training_f)
     with open(val_data) as valid_f:
         validation = json.load(valid_f)
+    with open(test_data) as test_f:
+        test = json.load(test_f)
 
     tra = []
+    tes = []
     val = []
     for elt in training:
         tra.append((elt["text"].split(),int(elt["stars"]-1)))
+    for elt in test:
+        tes.append((elt["text"].split(),int(elt["stars"]-1)))
     for elt in validation:
         val.append((elt["text"].split(),int(elt["stars"]-1)))
 
-    return tra, val
+    return tra, tes, val
 
 
 if __name__ == "__main__":
@@ -113,12 +118,13 @@ if __name__ == "__main__":
 
     # load data
     print("========== Loading data ==========")
-    train_data, valid_data = load_data(args.train_data, args.val_data) # X_data is a list of pairs (document, y); y in {0,1,2,3,4}
+    train_data, test_data, valid_data = load_data(args.train_data, args.val_data, args.test_data) 
     vocab = make_vocab(train_data)
     vocab, word2index, index2word = make_indices(vocab)
 
     print("========== Vectorizing data ==========")
     train_data = convert_to_vector_representation(train_data, word2index)
+    test_data = convert_to_vector_representation(test_data, word2index)
     valid_data = convert_to_vector_representation(valid_data, word2index)
     
 
