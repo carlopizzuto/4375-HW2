@@ -17,20 +17,28 @@ unk = '<UNK>'
 # Consult the PyTorch documentation for information on the functions used below:
 # https://pytorch.org/docs/stable/torch.html
 class RNN(nn.Module):
-    def __init__(self, input_dim, h):  # Add relevant parameters
+    def __init__(self, input_dim, h):
         super(RNN, self).__init__()
-        self.h = h
-        self.numOfLayer = 1
+        self.h = h  # number of hidden units (neurons)
+        self.numOfLayer = 1  # number of RNN layers stacked together
+        #======== RNN Layer Start ========
+        # input_dim: size of input vectors
+        # h: number of hidden units
+        # nonlinearity: activation function for hidden layer
         self.rnn = nn.RNN(input_dim, h, self.numOfLayer, nonlinearity='tanh')
-        self.W = nn.Linear(h, 5)
-        self.softmax = nn.LogSoftmax(dim=1)
-        self.loss = nn.NLLLoss()
+        #======== RNN Layer End ========
+        self.output_dim = 5  # number of classes for star ratings 1-5
+        #======== Output Layer Start ========
+        self.W = nn.Linear(h, self.output_dim)  # hidden layer to output layer 
+        self.softmax = nn.LogSoftmax(dim=1)  # log softmax for output probabilities
+        #======== Output Layer End ========
+        self.loss = nn.NLLLoss()  # negative log likelihood loss function for training
 
     def compute_Loss(self, predicted_vector, gold_label):
         return self.loss(predicted_vector, gold_label)
 
     def forward(self, inputs):
-        # [to fill] obtain hidden layer representation (https://pytorch.org/docs/stable/generated/torch.nn.RNN.html)
+        # [to fill] obtain hidden layer representation 
         _, hidden = self.rnn(inputs)
         # [to fill] obtain output layer representations
         hidden = hidden[-1]
@@ -93,11 +101,11 @@ if __name__ == "__main__":
     last_train_accuracy = 0
     last_validation_accuracy = 0
 
+    print("========== Training for {} epochs ==========".format(args.epochs))
     while not stopping_condition:
         random.shuffle(train_data)
         model.train()
         # You will need further code to operationalize training, ffnn.py may be helpful
-        print("Training started for epoch {}".format(epoch + 1))
         train_data = train_data
         correct = 0
         total = 0
@@ -106,6 +114,8 @@ if __name__ == "__main__":
 
         loss_total = 0
         loss_count = 0
+        
+        print("Training started for epoch {}".format(epoch + 1))
         
         for minibatch_index in tqdm(range(N // minibatch_size)):
             optimizer.zero_grad()
