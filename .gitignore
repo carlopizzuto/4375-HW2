@@ -130,6 +130,7 @@ dmypy.json
 
 # Word Document data
 ~*
+*.docx
 
 
 word_embedding.pkl

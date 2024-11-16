@@ -10,12 +10,12 @@ One example on running the code:
 
 **FFNN**
 
-To run the FFNN model, run ``./ffnn.sh``
+To run the FFNN model, run ``bash ffnn.sh``
 
 Custom parameters can be set in the script.
 
 **RNN**
 
-To run the RNN model, run ``./rnn.sh``
+To run the RNN model, run ``bash rnn.sh``
 
 Custom parameters can be set in the script.
