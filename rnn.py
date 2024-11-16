@@ -100,8 +100,13 @@ if __name__ == "__main__":
 
     last_train_accuracy = 0
     last_validation_accuracy = 0
+    
+    metrics_table = np.zeros((args.epochs, 4))  # 4 columns for train_acc, val_acc, train_loss, val_loss
 
     print("========== Training for {} epochs ==========".format(args.epochs))
+    print("Hidden dimension: {}".format(args.hidden_dim))
+    print("Number of epochs: {}".format(args.epochs))
+    total_time = time.time()
     while not stopping_condition:
         random.shuffle(train_data)
         model.train()
@@ -153,11 +158,14 @@ if __name__ == "__main__":
             loss_count += 1
             loss.backward()
             optimizer.step()
+        
+        acc_test = correct / total
+        loss_test = loss.item()
     
         print(loss_total/loss_count)
         print("Training completed for epoch {}".format(epoch + 1))
-        print("Training accuracy for epoch {}: {}".format(epoch + 1, correct / total))
-        trainning_accuracy = correct/total
+        print("Training accuracy for epoch {}: {}".format(epoch + 1, acc_test))
+        trainning_accuracy = acc_test
 
         model.eval()
         correct = 0
@@ -178,11 +186,18 @@ if __name__ == "__main__":
             correct += int(predicted_label == gold_label)
             total += 1
             # print(predicted_label, gold_label)
+            
+        acc_val = correct / total
+        loss_val = loss.item()
         print("Validation completed for epoch {}".format(epoch + 1))
-        print("Validation accuracy for epoch {}: {}".format(epoch + 1, correct / total))
-        validation_accuracy = correct/total
-
-        if validation_accuracy < last_validation_accuracy and trainning_accuracy > last_train_accuracy:
+        print("Validation accuracy for epoch {}: {}".format(epoch + 1, acc_val))
+        validation_accuracy = acc_val
+        
+        metrics_table[epoch] = [acc_test, acc_val, loss_test, loss_val]
+        
+        validation_diff = validation_accuracy - last_validation_accuracy
+        trainning_diff = trainning_accuracy - last_train_accuracy
+        if validation_diff < -0.05 and trainning_diff > 0:
             stopping_condition=True
             print("Training done to avoid overfitting!")
             print("Best validation accuracy is:", last_validation_accuracy)
@@ -191,6 +206,15 @@ if __name__ == "__main__":
             last_train_accuracy = trainning_accuracy
 
         epoch += 1
+        if epoch == args.epochs:
+            stopping_condition = True
+        
+    print("========== Training completed ==========")
+    print("Total training time: {}".format(time.time() - total_time))
+    print("\nMetrics Table:")
+    print("epoch\ttrain_acc\tval_acc\t\ttrain_loss\tval_loss")
+    for epoch in range(args.epochs):
+        print(f"{epoch+1}\t{metrics_table[epoch][0]:.4f}\t\t{metrics_table[epoch][1]:.4f}\t\t{metrics_table[epoch][2]:.4f}\t\t{metrics_table[epoch][3]:.4f}")
 
 
 
